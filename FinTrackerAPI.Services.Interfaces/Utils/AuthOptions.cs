@@ -5,22 +5,22 @@ namespace FinTrackerAPI.Services.Interfaces.Utils
 {
     public class AuthOptions
     {
-        public const string ISSUER = "MyAuthServer";
+        public const string ISSUER = "FinTrackerAuthServer";
 
 
-        public const string USER_AUDIENCE = "AuthSystemUser";
+        public const string USER_AUDIENCE = "FinAuthSystemUser";
 
-        private const string USER_KEY = "mysupersecret_system_secretkey!213";
+        private const string USER_KEY = "mysuperfinsecret_system_secretkey!213";
 
 
         public const string SYSTEM_JWT_ACCESS_AUDIENCE = "AccessSystemUserJWT";
 
-        private const string SYSTEM_JWT_ACESS_KEY = "2d00ab04-0e59-4a78-a642-3a0bff06b5a8";
+        private const string SYSTEM_JWT_ACESS_KEY = "3b23be05-8t72-2a63-t152-4b5der81e4w1";
 
 
         public const int LIFETIME = 43200; // 12 hours
 
-        public static SymmetricSecurityKey GetSystemUserSymmetricSecurityKey()
+        public static SymmetricSecurityKey GetUserSymmetricSecurityKey()
         {
             return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(USER_KEY));
         }

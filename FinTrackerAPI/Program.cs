@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using FinTrackerAPI.Infrastructure.Data.Database;
 using FinTrackerAPI.Services.Interfaces.Utils;
+using FinTrackerAPI.Services.Interfaces.Interfaces;
+using FinTrackerAPI.Services.Interfaces.Services;
+using FinTrackerAPI.Infrastructure.Data.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +23,7 @@ builder.Services.AddAuthentication()
             ValidAudience = AuthOptions.USER_AUDIENCE,
             ValidateLifetime = true,
 
-            IssuerSigningKey = AuthOptions.GetSystemUserSymmetricSecurityKey(),
+            IssuerSigningKey = AuthOptions.GetUserSymmetricSecurityKey(),
             ValidateIssuerSigningKey = true
         };
     });
@@ -52,6 +55,25 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<AuthService>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<UserService>();
+
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<CategoryService>();
+
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<TransactionService>();
+
+builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+builder.Services.AddScoped<CurrencyService>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

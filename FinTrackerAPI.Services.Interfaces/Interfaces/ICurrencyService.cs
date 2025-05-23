@@ -8,7 +8,8 @@ namespace FinTrackerAPI.Services.Interfaces.Interfaces
         Task<ResponseResult<CurrencyDTO>> CreateAsync(CurrencyDTO currencyDTO);
         Task<ResponseResult<CurrencyDTO>> GetAllAsync();
         Task<ResponseResult<CurrencyDTO>> GetByCodeAsync(string code);
+        Task<ResponseResult<CurrencyDTO>> GetByIdAsync(int id);
         Task<ResponseResult<CurrencyDTO>> UpdateAsync(CurrencyDTO currencyDTO);
-        Task<ResponseResult<CurrencyDTO>> DeleteAsync(string code);
+        Task<ResponseResult<CurrencyDTO>> DeleteAsync(int id);
     }
 }

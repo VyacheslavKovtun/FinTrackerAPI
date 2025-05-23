@@ -12,6 +12,7 @@ namespace FinTrackerAPI.Infrastructure.Business.DTO
         public Guid Id { get; set; }
         public string? Name { get; set; }
         public string Email { get; set; }
+        public string? APIToken { get; set; }
         public string PasswordHash { get; set; }
         public string? PreferredCurrencyCode { get; set; }
         public string? AvatarUrl { get; set; }

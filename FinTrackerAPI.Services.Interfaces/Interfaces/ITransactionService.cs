@@ -7,10 +7,10 @@ namespace FinTrackerAPI.Services.Interfaces.Interfaces
     {
         Task<ResponseResult<TransactionDTO>> CreateAsync(TransactionDTO transactionDTO);
         Task<ResponseResult<TransactionDTO>> GetAllAsync();
-        Task<ResponseResult<TransactionDTO>> GetByIdAsync(Guid id);
-        Task<ResponseResult<TransactionDTO>> GetByUserIdAsync(Guid userId);
+        Task<ResponseResult<TransactionDTO>> GetByIdAsync(string id);
+        Task<ResponseResult<TransactionDTO>> GetByUserIdAsync(string userId);
         Task<ResponseResult<TransactionDTO>> GetByCategoryAsync(int categoryId);
         Task<ResponseResult<TransactionDTO>> UpdateAsync(TransactionDTO transactionDTO);
-        Task<ResponseResult<TransactionDTO>> DeleteAsync(Guid id);
+        Task<ResponseResult<TransactionDTO>> DeleteAsync(string id);
     }
 }

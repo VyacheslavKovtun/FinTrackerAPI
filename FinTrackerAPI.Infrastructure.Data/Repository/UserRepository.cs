@@ -39,6 +39,7 @@ namespace FinTrackerAPI.Infrastructure.Data.Repository
 
             user.Name = value.Name;
             user.Email = value.Email;
+            user.APIToken = value.APIToken;
             user.PasswordHash = value.PasswordHash;
             user.PreferredCurrencyCode = value.PreferredCurrencyCode;
             user.AvatarUrl = value.AvatarUrl;

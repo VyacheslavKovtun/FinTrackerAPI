@@ -44,11 +44,12 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             }
         }
 
-        public async Task<ResponseResult<UserDTO>> DeleteAsync(Guid id)
+        public async Task<ResponseResult<UserDTO>> DeleteAsync(string id)
         {
             try
             {
-                await _unitOfWork.UserRepository.DeleteAsync(id);
+                var gId = new Guid(id);
+                await _unitOfWork.UserRepository.DeleteAsync(gId);
 
                 return new ResponseResult<UserDTO>
                 {
@@ -93,11 +94,13 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             }
         }
 
-        public async Task<ResponseResult<UserDTO>> GetByIdAsync(Guid id)
+        public async Task<ResponseResult<UserDTO>> GetByIdAsync(string id)
         {
             try
             {
-                var user = await _unitOfWork.UserRepository.GetAsync(id);
+                var gId = new Guid(id);
+
+                var user = await _unitOfWork.UserRepository.GetAsync(gId);
                 var userDTO = mapper.Mapper.Map<UserDTO>(user);
 
                 if (userDTO == null)
