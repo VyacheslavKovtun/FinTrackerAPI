@@ -59,6 +59,9 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<AuthService>();
 
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<EmailService>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<UserService>();
 

@@ -50,10 +50,10 @@ namespace FinTrackerAPI.Controllers
             return await _userService.UpdateAsync(user);
         }
 
-        [HttpDelete("delete/{id}")]
-        public async Task<ResponseResult<UserDTO>> DeleteUser(string id)
+        [HttpDelete("delete/{id}/{passwordHash}")]
+        public async Task<ResponseResult<UserDTO>> DeleteUser(string id, string passwordHash)
         {
-            return await _userService.DeleteAsync(id);
+            return await _userService.DeleteAsync(id, passwordHash);
         }
 
     }

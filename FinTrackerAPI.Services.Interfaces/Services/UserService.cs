@@ -4,6 +4,7 @@ using FinTrackerAPI.Infrastructure.Business.DTO;
 using FinTrackerAPI.Infrastructure.Data.UnitOfWork;
 using FinTrackerAPI.Services.Interfaces.Interfaces;
 using FinTrackerAPI.Services.Interfaces.Models;
+using FinTrackerAPI.Services.Interfaces.Utils;
 
 namespace FinTrackerAPI.Services.Interfaces.Services
 {
@@ -44,11 +45,16 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             }
         }
 
-        public async Task<ResponseResult<UserDTO>> DeleteAsync(string id)
+        public async Task<ResponseResult<UserDTO>> DeleteAsync(string id, string passwordHash)
         {
             try
             {
                 var gId = new Guid(id);
+
+                var user = await _unitOfWork.UserRepository.GetAsync(gId);
+                if (user.PasswordHash != passwordHash)
+                    throw new AccessViolationException("Password is not correct!");
+
                 await _unitOfWork.UserRepository.DeleteAsync(gId);
 
                 return new ResponseResult<UserDTO>

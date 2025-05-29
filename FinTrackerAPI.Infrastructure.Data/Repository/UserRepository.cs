@@ -45,6 +45,7 @@ namespace FinTrackerAPI.Infrastructure.Data.Repository
             user.AvatarUrl = value.AvatarUrl;
             user.CreatedAt = value.CreatedAt;
             user.UpdatedAt = value.UpdatedAt;
+            user.IsEmailConfirmed = value.IsEmailConfirmed;
 
             ctx.Entry(user).State = EntityState.Modified;
             await ctx.SaveChangesAsync();

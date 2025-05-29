@@ -1,5 +1,8 @@
-﻿using FinTrackerAPI.Infrastructure.Business.AutoMapper;
+﻿using Azure.Core;
+using FinTrackerAPI.Domain.Core.Entities;
+using FinTrackerAPI.Infrastructure.Business.AutoMapper;
 using FinTrackerAPI.Infrastructure.Business.DTO;
+using FinTrackerAPI.Infrastructure.Data.Repository;
 using FinTrackerAPI.Infrastructure.Data.UnitOfWork;
 using FinTrackerAPI.Services.Interfaces.Interfaces;
 using FinTrackerAPI.Services.Interfaces.Models;
@@ -15,13 +18,15 @@ namespace FinTrackerAPI.Services.Interfaces.Services
         private IUnitOfWork unitOfWork;
         private AutoMap mapper = AutoMap.Instance;
         //private readonly ILogger<AuthService> _logger;
-        private IUserService _appUserService;
+        private IUserService _userService;
+        private IEmailService _emailService;
 
-        public AuthService (IUnitOfWork unitOfWork, UserService appUserService)
+        public AuthService (IUnitOfWork unitOfWork, UserService userService, EmailService emailService)
         {
             this.unitOfWork = unitOfWork;
             //_logger = logger;
-            _appUserService = appUserService;
+            _userService = userService;
+            _emailService = emailService;
         }
 
         public async Task<ResponseResult<UserDTO>> LoginAsync(string email, string password)
@@ -34,7 +39,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
                     throw new Exception("User was not found!");
 
                 userDTO.APIToken = GenerateUserJWT();
-                var updated = await _appUserService.UpdateAsync(userDTO);
+                var updated = await _userService.UpdateAsync(userDTO);
 
                 return new ResponseResult<UserDTO>
                 {
@@ -74,6 +79,49 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
             return encodedJwt;
+        }
+
+        public async Task<ResponseResult<UserDTO>> RegisterAsync(UserDTO userDTO)
+        {
+            try
+            {
+                var existingUser = await _userService.GetByEmailAsync(userDTO.Email);
+                if (existingUser != null)
+                    throw new Exception("User with the same email already exists!");
+
+                var emailToken = Guid.NewGuid().ToString("N");
+
+                var newUserDTO = new UserDTO
+                {
+                    Id = Guid.NewGuid(),
+                    Name = userDTO.Name,
+                    Email = userDTO.Email,
+                    PasswordHash = PasswordHelper.HashPassword(userDTO.PasswordHash),
+                    IsEmailConfirmed = false
+                };
+
+                var user = mapper.Mapper.Map<User>(userDTO);
+
+                user.CreatedAt = DateTime.Now;
+                await unitOfWork.UserRepository.CreateAsync(user);
+
+                var confirmationUrl = $"http://localhost:5206/api/auth/confirm-email?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(emailToken)}";
+                var sent = await _emailService.SendEmailConfirmationAsync(user.Email, confirmationUrl);
+
+                return new ResponseResult<UserDTO>
+                {
+                    Code = ResponseResultCode.Success
+                };
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError($"(API_USER_ERROR) CREATE ERROR (User: {userDTO?.LocalUserId}; {userDTO?.CustomerId}): {ex.Message}", ex);
+                return new ResponseResult<UserDTO>
+                {
+                    Code = ResponseResultCode.Failed,
+                    Message = ex.Message
+                };
+            }
         }
     }
 }

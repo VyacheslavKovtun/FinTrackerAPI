@@ -19,5 +19,7 @@ namespace FinTrackerAPI.Domain.Core.Entities
         public string? AvatarUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
+        public bool IsEmailConfirmed { get; set; }
     }
 }

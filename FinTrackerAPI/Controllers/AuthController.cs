@@ -1,4 +1,5 @@
 ﻿using FinTrackerAPI.Infrastructure.Business.DTO;
+using FinTrackerAPI.Infrastructure.Data.Repository;
 using FinTrackerAPI.Models;
 using FinTrackerAPI.Services.Interfaces.Interfaces;
 using FinTrackerAPI.Services.Interfaces.Models;
@@ -16,10 +17,12 @@ namespace FinTrackerAPI.Controllers
     public class AuthController : ControllerBase
     {
         private IAuthService _authService;
+        private IUserService _userService;
 
-        public AuthController(AuthService authService)
+        public AuthController(AuthService authService, UserService userService)
         {
             _authService = authService;
+            _userService = userService;
         }
 
         [HttpPost("login")]
@@ -35,6 +38,31 @@ namespace FinTrackerAPI.Controllers
             var loginViewModel = JsonConvert.DeserializeObject<LoginViewModel>(loginViewModelJson);
 
             return await _authService.LoginAsync(loginViewModel.Email, loginViewModel.Password);
+        }
+
+        [HttpPost("register")]
+        public async Task<ResponseResult<UserDTO>> Register([FromBody] UserDTO userDTO)
+        {
+            return await _authService.RegisterAsync(userDTO);
+        }
+
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
+        {
+            ResponseResult<UserDTO> userResponse = await _userService.GetByEmailAsync(email);
+            if (userResponse.Code != ResponseResultCode.Success)
+                return NotFound(new { message = "User not found or error occurred." });
+
+            UserDTO user = userResponse.Value;
+
+            if (user.IsEmailConfirmed)
+                return Ok(new { message = "Email is already confirmed." });
+
+            user.IsEmailConfirmed = true;
+            user.UpdatedAt = DateTime.Now;
+
+            await _userService.UpdateAsync(user);
+            return Ok(new { message = "Email confirmed successfully!" });
         }
     }
 }
