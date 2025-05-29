@@ -41,9 +41,9 @@ namespace FinTrackerAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ResponseResult<UserDTO>> Register([FromBody] UserDTO userDTO)
+        public async Task<ResponseResult<UserDTO>> Register([FromBody] RegisterViewModel registerViewModel)
         {
-            return await _authService.RegisterAsync(userDTO);
+            return await _authService.RegisterAsync(registerViewModel);
         }
 
         [HttpGet("confirm-email")]

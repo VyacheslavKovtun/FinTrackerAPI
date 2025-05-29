@@ -81,31 +81,35 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             return encodedJwt;
         }
 
-        public async Task<ResponseResult<UserDTO>> RegisterAsync(UserDTO userDTO)
+        public async Task<ResponseResult<UserDTO>> RegisterAsync(RegisterViewModel registerViewModel)
         {
             try
             {
-                var existingUser = await _userService.GetByEmailAsync(userDTO.Email);
-                if (existingUser != null)
+                var existingUserResponse = await _userService.GetByEmailAsync(registerViewModel.Email);
+                if (existingUserResponse.Code == ResponseResultCode.Success)
                     throw new Exception("User with the same email already exists!");
+
+                if (existingUserResponse.Code == ResponseResultCode.Failed)
+                    throw new Exception("Error loading information from database");
 
                 var emailToken = Guid.NewGuid().ToString("N");
 
                 var newUserDTO = new UserDTO
                 {
                     Id = Guid.NewGuid(),
-                    Name = userDTO.Name,
-                    Email = userDTO.Email,
-                    PasswordHash = PasswordHelper.HashPassword(userDTO.PasswordHash),
+                    Name = registerViewModel.Name,
+                    Email = registerViewModel.Email,
+                    PasswordHash = PasswordHelper.HashPassword(registerViewModel.Password),
+                    PreferredCurrencyCode = registerViewModel.PreferredCurrencyCode,
                     IsEmailConfirmed = false
                 };
 
-                var user = mapper.Mapper.Map<User>(userDTO);
+                var user = mapper.Mapper.Map<User>(newUserDTO);
 
                 user.CreatedAt = DateTime.Now;
                 await unitOfWork.UserRepository.CreateAsync(user);
 
-                var confirmationUrl = $"http://localhost:5206/api/auth/confirm-email?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(emailToken)}";
+                var confirmationUrl = $"http://localhost:4200/register/confirm-email?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(emailToken)}";
                 var sent = await _emailService.SendEmailConfirmationAsync(user.Email, confirmationUrl);
 
                 return new ResponseResult<UserDTO>
