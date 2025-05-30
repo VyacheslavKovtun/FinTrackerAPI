@@ -38,6 +38,23 @@ namespace FinTrackerAPI.Services.Interfaces.Services
                 if (userDTO == null)
                     throw new Exception("User was not found!");
 
+                if (!userDTO.IsEmailConfirmed)
+                {
+                    if(userDTO.EmailConfirmationToken != null && userDTO.UpdatedAt.HasValue && DateTime.Now > userDTO.UpdatedAt.Value.AddMinutes(5))
+                    {
+                        throw new Exception("Email is not confirmed. Check your mail to get a confirmation link or try again in 5 minutes to get a new one");
+                    }
+
+                    var emailToken = Guid.NewGuid().ToString("N");
+                    userDTO.EmailConfirmationToken = emailToken;
+                    await _userService.UpdateAsync(userDTO);
+
+                    var confirmationUrl = $"http://localhost:4200/register/confirm-email?userid={Uri.EscapeDataString(userDTO.Id.ToString())}&token={Uri.EscapeDataString(emailToken)}";
+                    var sent = await _emailService.SendEmailConfirmationAsync(userDTO.Email, confirmationUrl);
+
+                    throw new Exception("Email is not confirmed. New confirmation link was sent");
+                }
+
                 userDTO.APIToken = GenerateUserJWT();
                 var updated = await _userService.UpdateAsync(userDTO);
 
@@ -101,7 +118,8 @@ namespace FinTrackerAPI.Services.Interfaces.Services
                     Email = registerViewModel.Email,
                     PasswordHash = PasswordHelper.HashPassword(registerViewModel.Password),
                     PreferredCurrencyCode = registerViewModel.PreferredCurrencyCode,
-                    IsEmailConfirmed = false
+                    IsEmailConfirmed = false,
+                    EmailConfirmationToken = emailToken
                 };
 
                 var user = mapper.Mapper.Map<User>(newUserDTO);
@@ -109,7 +127,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
                 user.CreatedAt = DateTime.Now;
                 await unitOfWork.UserRepository.CreateAsync(user);
 
-                var confirmationUrl = $"http://localhost:4200/register/confirm-email?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(emailToken)}";
+                var confirmationUrl = $"http://localhost:4200/register/confirm-email?userid={Uri.EscapeDataString(user.Id.ToString())}&token={Uri.EscapeDataString(emailToken)}";
                 var sent = await _emailService.SendEmailConfirmationAsync(user.Email, confirmationUrl);
 
                 return new ResponseResult<UserDTO>

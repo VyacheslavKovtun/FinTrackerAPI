@@ -20,5 +20,6 @@ namespace FinTrackerAPI.Infrastructure.Business.DTO
         public DateTime? UpdatedAt { get; set; }
 
         public bool IsEmailConfirmed { get; set; }
+        public string? EmailConfirmationToken { get; set; }
     }
 }

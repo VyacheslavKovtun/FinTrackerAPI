@@ -21,5 +21,6 @@ namespace FinTrackerAPI.Domain.Core.Entities
         public DateTime? UpdatedAt { get; set; }
 
         public bool IsEmailConfirmed { get; set; }
+        public string? EmailConfirmationToken { get; set; }
     }
 }

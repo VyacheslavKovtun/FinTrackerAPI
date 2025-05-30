@@ -31,15 +31,6 @@ namespace FinTrackerAPI.Controllers
             return await _authService.LoginAsync(loginViewModel.Email, loginViewModel.Password);
         }
 
-        [HttpGet("login/token/{authtoken}")]
-        public async Task<ResponseResult<UserDTO>> LoginUsingToken(string authtoken)
-        {
-            var loginViewModelJson = SymmetricEncryption.Decrypt(Convert.FromBase64String(authtoken));
-            var loginViewModel = JsonConvert.DeserializeObject<LoginViewModel>(loginViewModelJson);
-
-            return await _authService.LoginAsync(loginViewModel.Email, loginViewModel.Password);
-        }
-
         [HttpPost("register")]
         public async Task<ResponseResult<UserDTO>> Register([FromBody] RegisterViewModel registerViewModel)
         {
@@ -47,9 +38,9 @@ namespace FinTrackerAPI.Controllers
         }
 
         [HttpGet("confirm-email")]
-        public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string userid, [FromQuery] string token)
         {
-            ResponseResult<UserDTO> userResponse = await _userService.GetByEmailAsync(email);
+            ResponseResult<UserDTO> userResponse = await _userService.GetByIdAsync(userid);
             if (userResponse.Code != ResponseResultCode.Success)
                 return NotFound(new { message = "User not found or error occurred." });
 
@@ -58,7 +49,11 @@ namespace FinTrackerAPI.Controllers
             if (user.IsEmailConfirmed)
                 return Ok(new { message = "Email is already confirmed." });
 
+            if (user.EmailConfirmationToken != token)
+                return BadRequest(new { message = "Invalid confirmation token." });
+
             user.IsEmailConfirmed = true;
+            user.EmailConfirmationToken = null;
             user.UpdatedAt = DateTime.Now;
 
             await _userService.UpdateAsync(user);
