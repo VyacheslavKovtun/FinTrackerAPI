@@ -43,7 +43,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
 
                 UserDTO userDTO = userResponse.Value;
 
-                if(PasswordHelper.VerifyPassword(password, userDTO.PasswordHash))
+                if(!PasswordHelper.VerifyPassword(password, userDTO.PasswordHash))
                     throw new Exception("Wrong password!");
 
                 if (!userDTO.IsEmailConfirmed)

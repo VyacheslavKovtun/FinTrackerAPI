@@ -13,7 +13,7 @@ namespace FinTrackerAPI.Domain.Core.Entities
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public int CategoryId { get; set; }
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public string CurrencyCode { get; set; }
         public DateTime Date { get; set; }
         public string? Notes { get; set; }
