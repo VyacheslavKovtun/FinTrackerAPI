@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using FinTrackerAPI.Infrastructure.Data.Database;
@@ -8,10 +6,15 @@ using FinTrackerAPI.Services.Interfaces.Utils;
 using FinTrackerAPI.Services.Interfaces.Interfaces;
 using FinTrackerAPI.Services.Interfaces.Services;
 using FinTrackerAPI.Infrastructure.Data.UnitOfWork;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = "User";
+        options.DefaultChallengeScheme = "User";
+    })
     .AddJwtBearer("User", options =>
     {
         options.RequireHttpsMetadata = false;
@@ -23,8 +26,9 @@ builder.Services.AddAuthentication()
             ValidAudience = AuthOptions.USER_AUDIENCE,
             ValidateLifetime = true,
 
-            IssuerSigningKey = AuthOptions.GetUserSymmetricSecurityKey(),
-            ValidateIssuerSigningKey = true
+            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.FromMinutes(5)
         };
     });
 

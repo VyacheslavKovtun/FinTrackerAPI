@@ -33,6 +33,12 @@ namespace FinTrackerAPI.Controllers
             _cache = cache;
         }
 
+        [HttpGet("test")]
+        public async Task<bool> Test()
+        {
+            return await _authService.Test();
+        }
+
         [HttpPost("login")]
         public async Task<ResponseResult<UserDTO>> Login([FromBody] LoginViewModel loginViewModel)
         {

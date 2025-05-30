@@ -10,6 +10,7 @@ using FinTrackerAPI.Services.Interfaces.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace FinTrackerAPI.Services.Interfaces.Services
 {
@@ -27,6 +28,33 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             //_logger = logger;
             _userService = userService;
             _emailService = emailService;
+        }
+
+        public async Task<bool> Test()
+        {
+            var token = GenerateUserJWT();
+            var handler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = AuthOptions.ISSUER,
+                ValidateAudience = true,
+                ValidAudience = AuthOptions.USER_AUDIENCE,
+                ValidateLifetime = true,
+                IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                ValidateIssuerSigningKey = true,
+                ClockSkew = TimeSpan.FromMinutes(5)
+            };
+
+            try
+            {
+                handler.ValidateToken(token, validationParameters, out var validatedToken);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task<ResponseResult<UserDTO>> LoginAsync(string email, string password)
@@ -86,16 +114,27 @@ namespace FinTrackerAPI.Services.Interfaces.Services
         public string GenerateUserJWT()
         {
             var now = DateTime.UtcNow;
+            var expires = now.Add(TimeSpan.FromSeconds(AuthOptions.LIFETIME));
+
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, "user"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, ((DateTimeOffset)now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+            };
+
             var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.USER_AUDIENCE, null,
-                    notBefore: now,
-                    expires: now.Add(TimeSpan.FromSeconds(AuthOptions.LIFETIME)),
-                    signingCredentials: new SigningCredentials(AuthOptions.GetUserSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                issuer: AuthOptions.ISSUER,
+                audience: AuthOptions.USER_AUDIENCE,
+                claims: claims,
+                notBefore: now,
+                expires: expires,
+                signingCredentials: new SigningCredentials(
+                    AuthOptions.GetSymmetricSecurityKey(),
+                    SecurityAlgorithms.HmacSha256)
+            );
 
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            return encodedJwt;
+            return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
 
         public async Task<ResponseResult<UserDTO>> RegisterAsync(RegisterViewModel registerViewModel)
