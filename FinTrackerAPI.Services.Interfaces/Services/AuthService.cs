@@ -48,7 +48,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
 
                 if (!userDTO.IsEmailConfirmed)
                 {
-                    if(userDTO.EmailConfirmationToken != null && userDTO.UpdatedAt.HasValue && DateTime.Now > userDTO.UpdatedAt.Value.AddMinutes(5))
+                    if(userDTO.EmailConfirmationToken != null && userDTO.UpdatedAt.HasValue && DateTime.Now < userDTO.UpdatedAt.Value.AddMinutes(5))
                     {
                         throw new Exception("Email is not confirmed. Check your mail to get a confirmation link or try again in 5 minutes to get a new one");
                     }

@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinTrackerAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Policy = "User")]
     [ApiController]
     public class CurrencyController : ControllerBase
     {
@@ -32,18 +31,21 @@ namespace FinTrackerAPI.Controllers
             return await _currencyService.GetByIdAsync(id);
         }
 
+        [Authorize(Policy = "User")]
         [HttpPost("create")]
         public async Task<ResponseResult<CurrencyDTO>> CreateCurrency([FromBody] CurrencyDTO currency)
         {
             return await _currencyService.CreateAsync(currency);
         }
 
+        [Authorize(Policy = "User")]
         [HttpPut("update")]
         public async Task<ResponseResult<CurrencyDTO>> UpdateCurrency([FromBody] CurrencyDTO currency)
         {
             return await _currencyService.UpdateAsync(currency);
         }
 
+        [Authorize(Policy = "User")]
         [HttpDelete("delete/{id}")]
         public async Task<ResponseResult<CurrencyDTO>> DeleteCurrency(int id)
         {
