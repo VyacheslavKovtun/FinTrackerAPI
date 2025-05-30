@@ -26,8 +26,6 @@ namespace FinTrackerAPI.Infrastructure.Data.Repository
         {
             var updatedEmail = email.Trim().ToLower();
 
-            //CONVERT HASH TO Password
-
             var user = await table.FirstOrDefaultAsync(u => u.Email.ToLower() == updatedEmail && u.PasswordHash == password);
 
             return user;

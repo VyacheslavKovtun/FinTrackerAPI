@@ -33,10 +33,18 @@ namespace FinTrackerAPI.Services.Interfaces.Services
         {
             try
             {
-                UserDTO userDTO = await GetAppUserByEmailLoginData(email, password);
+                var userResponse = await _userService.GetByEmailAsync(email);
 
-                if (userDTO == null)
+                if (userResponse.Code == ResponseResultCode.NothingFound)
                     throw new Exception("User was not found!");
+
+                if (userResponse.Code == ResponseResultCode.Failed)
+                    throw new Exception("Error loading information from database");
+
+                UserDTO userDTO = userResponse.Value;
+
+                if(PasswordHelper.VerifyPassword(password, userDTO.PasswordHash))
+                    throw new Exception("Wrong password!");
 
                 if (!userDTO.IsEmailConfirmed)
                 {
@@ -73,14 +81,6 @@ namespace FinTrackerAPI.Services.Interfaces.Services
                     Message = ex.Message
                 };
             }
-        }
-
-        private async Task<UserDTO> GetAppUserByEmailLoginData(string email, string password)
-        {
-            var appUser = await unitOfWork.UserRepository.GetByEmailLoginDataAsync(email, password);
-            var userDTO = mapper.Mapper.Map<UserDTO>(appUser);
-
-            return userDTO;
         }
 
         public string GenerateUserJWT()

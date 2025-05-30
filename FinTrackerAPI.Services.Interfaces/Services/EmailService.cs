@@ -52,5 +52,30 @@ namespace FinTrackerAPI.Services.Interfaces.Services
 
             return true;
         }
+
+        public async Task<bool> SendEmailResetPasswordAsync(string toEmail, string resetLink)
+        {
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Financial Tracker", _config["Email:From"]));
+            message.To.Add(MailboxAddress.Parse(toEmail));
+            message.Subject = "Reset password";
+
+            var bodyBuilder = new BodyBuilder
+            {
+                HtmlBody = $"<p>Please click the link below to reset your password (the link is active for 10 minutes):</p>" +
+                           $"<p><a href='{resetLink}'>Confirm Email</a></p>"
+            };
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            using var smtp = new MailKit.Net.Smtp.SmtpClient();
+            await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+
+            await smtp.AuthenticateAsync(_config["Email:From"], _config["Email:Password"]);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
+
+            return true;
+        }
     }
 }
