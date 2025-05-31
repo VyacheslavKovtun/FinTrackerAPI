@@ -36,7 +36,7 @@ namespace FinTrackerAPI.Infrastructure.Data.Repository
             transaction.UserId = value.UserId;
             transaction.CategoryId = value.CategoryId;
             transaction.Amount = value.Amount;
-            transaction.CurrencyCode = value.CurrencyCode;
+            transaction.CurrencyId = value.CurrencyId;
             transaction.Date = value.Date;
             transaction.Notes = value.Notes;
 

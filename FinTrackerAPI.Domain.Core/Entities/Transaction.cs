@@ -14,7 +14,7 @@ namespace FinTrackerAPI.Domain.Core.Entities
         public Guid UserId { get; set; }
         public int CategoryId { get; set; }
         public decimal Amount { get; set; }
-        public string CurrencyCode { get; set; }
+        public int CurrencyId { get; set; }
         public DateTime Date { get; set; }
         public string? Notes { get; set; }
     }
