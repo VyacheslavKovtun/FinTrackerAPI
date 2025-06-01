@@ -66,7 +66,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             }
         }
 
-        public ResponseResult<ExpenseCategorySummary> GetTopExpenseCategories(string userId, int topN = 10, int? days = 30)
+        public ResponseResult<ExpenseCategorySummary> GetTopExpenseCategories(string userId, int? topN = 10, int? days = 30)
         {
             var result = new List<ExpenseCategorySummary>();
             try

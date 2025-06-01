@@ -29,9 +29,9 @@ namespace RDTApi.Controllers
 
         [HttpGet("topexpensecategories/{userId}/{topN}/{days}")]
         [Authorize(Policy = "User")]
-        public async Task<ResponseResult<ExpenseCategorySummary>> GetTopExpenseCategories(string userId, int topN = 10, int? days)
+        public async Task<ResponseResult<ExpenseCategorySummary>> GetTopExpenseCategories(string userId, int? topN = 10, int? days = 365)
         {
-            return await Task.Run(() => _dashboardService.GetTopExpenseCategories(userId,topN, days));
+            return await Task.Run(() => _dashboardService.GetTopExpenseCategories(userId, topN, days));
         }
 
         [HttpGet("monthlybalancetrend/{userId}")]
