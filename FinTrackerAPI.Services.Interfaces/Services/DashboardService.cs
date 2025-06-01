@@ -284,7 +284,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             }
         }
 
-        public ResponseResult<TransactionDTO> GetLastTransactions(string userId, int count = 20)
+        public ResponseResult<TransactionDTO> GetLastTransactions(string userId, int? count = 20)
         {
             try
             {
@@ -338,7 +338,5 @@ namespace FinTrackerAPI.Services.Interfaces.Services
                 };
             }
         }
-
-
     }
 }

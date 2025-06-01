@@ -1,4 +1,5 @@
-﻿using FinTrackerAPI.Services.Interfaces.Models;
+﻿using FinTrackerAPI.Infrastructure.Business.DTO;
+using FinTrackerAPI.Services.Interfaces.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace FinTrackerAPI.Services.Interfaces.Interfaces
         ResponseResult<MonthlyIncomeExpense> GetMonthlyIncomeExpenseTrend(string userId, int? year);
         ResponseResult<DailyExpenseAverage> GetAverageDailyExpense(string userId, int? days);
         ResponseResult<DailyExpense> GetDailyExpenses(string userId, int? days);
+        ResponseResult<TransactionDTO> GetLastTransactions(string userId, int? count);
     }
 }
