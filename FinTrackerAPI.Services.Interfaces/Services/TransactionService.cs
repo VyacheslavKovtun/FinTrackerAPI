@@ -25,7 +25,6 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             {
                 var transaction = mapper.Mapper.Map<Transaction>(transactionDTO);
 
-                transaction.Date = DateTime.Now;
                 await _unitOfWork.TransactionRepository.CreateAsync(transaction);
 
                 return new ResponseResult<TransactionDTO>
