@@ -17,7 +17,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             return "Data Source=DESKTOP-A49B8TD\\MSSQLSERVER01;Initial Catalog=FinTracker;User ID=finUser;Password=Password8;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False";
         }
 
-        public ResponseResult<FinancialSummary> GetFinancialSummary(string userId)
+        public ResponseResult<FinancialSummary> GetFinancialSummary(string userId, int? days = 365)
         {
             try
             {
@@ -30,6 +30,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
                     SqlCommand cmd = new SqlCommand("GetFinancialSummary", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(new SqlParameter("@UserId", userId));
+                    cmd.Parameters.AddWithValue("@Days", days);
                     cmd.CommandTimeout = 90;
 
                     using (SqlDataReader rdr = cmd.ExecuteReader())
@@ -65,7 +66,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             }
         }
 
-        public ResponseResult<ExpenseCategorySummary> GetTopExpenseCategories(string userId, int topN = 10)
+        public ResponseResult<ExpenseCategorySummary> GetTopExpenseCategories(string userId, int topN = 10, int? days = 30)
         {
             var result = new List<ExpenseCategorySummary>();
             try
@@ -77,6 +78,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(new SqlParameter("@UserId", userId));
                     cmd.Parameters.Add(new SqlParameter("@TopN", topN));
+                    cmd.Parameters.AddWithValue("@Days", days);
                     using (var rdr = cmd.ExecuteReader())
                     {
                         while (rdr.Read())
@@ -251,7 +253,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
                     };
 
                     cmd.Parameters.Add(new SqlParameter("@UserId", userId));
-                    cmd.Parameters.AddWithValue("@Days", days ?? 14);
+                    cmd.Parameters.AddWithValue("@Days", days);
 
                     using (var rdr = cmd.ExecuteReader())
                     {
@@ -284,7 +286,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
             }
         }
 
-        public ResponseResult<TransactionDTO> GetLastTransactions(string userId, int? count = 20)
+        public ResponseResult<TransactionDTO> GetLastTransactions(string userId, int? count = 20, int? days = 30)
         {
             try
             {
@@ -302,6 +304,7 @@ namespace FinTrackerAPI.Services.Interfaces.Services
 
                     cmd.Parameters.Add(new SqlParameter("@UserId", userId));
                     cmd.Parameters.Add(new SqlParameter("@Count", count));
+                    cmd.Parameters.AddWithValue("@Days", days);
 
                     using (var rdr = cmd.ExecuteReader())
                     {

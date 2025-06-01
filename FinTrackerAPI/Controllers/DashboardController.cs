@@ -20,18 +20,18 @@ namespace RDTApi.Controllers
             _dashboardService = dashboardService;
         }
 
-        [HttpGet("financialsummary/{userId}")]
+        [HttpGet("financialsummary/{userId}/{days}")]
         [Authorize(Policy = "User")]
-        public async Task<ResponseResult<FinancialSummary>> GetFinancialSummary(string userId)
+        public async Task<ResponseResult<FinancialSummary>> GetFinancialSummary(string userId, int? days)
         {
-            return await Task.Run(() => _dashboardService.GetFinancialSummary(userId));
+            return await Task.Run(() => _dashboardService.GetFinancialSummary(userId, days));
         }
 
-        [HttpGet("topexpensecategories/{userId}/{topN}")]
+        [HttpGet("topexpensecategories/{userId}/{topN}/{days}")]
         [Authorize(Policy = "User")]
-        public async Task<ResponseResult<ExpenseCategorySummary>> GetTopExpenseCategories(string userId, int topN = 10)
+        public async Task<ResponseResult<ExpenseCategorySummary>> GetTopExpenseCategories(string userId, int topN = 10, int? days)
         {
-            return await Task.Run(() => _dashboardService.GetTopExpenseCategories(userId,topN));
+            return await Task.Run(() => _dashboardService.GetTopExpenseCategories(userId,topN, days));
         }
 
         [HttpGet("monthlybalancetrend/{userId}")]
@@ -62,11 +62,11 @@ namespace RDTApi.Controllers
             return await Task.Run(() => _dashboardService.GetDailyExpenses(userId, days));
         }
 
-        [HttpGet("lasttransactions/{userId}/{count}")]
+        [HttpGet("lasttransactions/{userId}/{count}/{days}")]
         [Authorize(Policy = "User")]
-        public async Task<ResponseResult<TransactionDTO>> GetLastTransactions(string userId, int? count)
+        public async Task<ResponseResult<TransactionDTO>> GetLastTransactions(string userId, int? count, int? days)
         {
-            return await Task.Run(() => _dashboardService.GetLastTransactions(userId, count));
+            return await Task.Run(() => _dashboardService.GetLastTransactions(userId, count, days));
         }
     }
 }
